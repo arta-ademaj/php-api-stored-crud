@@ -14,10 +14,23 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $users = DB::select('CALL get_all_users()');
-        return response()->json($users);
+        $perPage = (int) $request->input('per_page', 10);
+        $page = (int) $request->input('page', 1);
+        $offset = ($page - 1) * $perPage;
+    
+        $users = DB::select('CALL get_all_users(?, ?)', [$perPage, $offset]);
+    
+        $total = DB::table('users')->count();
+    
+        return response()->json([
+            'data' => $users,
+            'current_page' => $page,
+            'per_page' => $perPage,
+            'total' => $total,
+            'last_page' => ceil($total / $perPage),
+        ]);
     }
 
     /**
