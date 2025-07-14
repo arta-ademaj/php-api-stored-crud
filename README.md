@@ -1,64 +1,243 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
+# PHP API with MySQL CRUD Using Stored Procedures
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A RESTful PHP API built with Laravel that performs full CRUD (Create, Read, Update, Delete) operations on a `users` table using **MySQL stored procedures**.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🚀 Technologies Used
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- **PHP 7.4.19**
+- **Laravel 8.83.29**
+- **MySQL 8+** (with stored procedures)
+- **Docker & Docker Compose**
+- **Composer**
+- **Postman** (for testing API endpoints)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## 🛠️ Setup Instructions
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 1. Clone the Repository
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```
+git clone https://github.com/arta-ademaj/php-api-stored-crud.git
+cd php-api-stored-crud
+```
 
-## Laravel Sponsors
+### 2. Install Dependencies
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+```
+composer install
+```
 
-### Premium Partners
+### 3. Create `.env` File
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+```
+cp .env.example .env
+php artisan key:generate
+```
 
-## Contributing
+Edit `.env` with your DB credentials:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=company_db
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
-## Code of Conduct
+### 4. Create Database
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Create a database named `company_db` (or the one you specified in `.env`) in MySQL:
 
-## Security Vulnerabilities
+```
+CREATE DATABASE company_db;
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 5. Run Migrations
 
-## License
+This project uses Laravel migrations to create both the database schema and the stored procedures. Run the following command:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```
+php artisan migrate
+```
+
+This will:
+- Create the `users` table
+- Create the stored procedures needed for CRUD operations
+
+---
+
+### 6. Clear and Cache Configuration (Optional)
+
+After updating your `.env` or configuration files, run:
+
+```bash
+php artisan config:clear
+php artisan cache:clear
+php artisan config:cache
+```
+
+## 🐳 Running with Docker
+
+### 1. Start Containers
+
+```
+docker-compose up -d --build
+```
+
+### 2. Install Dependencies inside the Container
+
+```
+docker exec -it laravel-app bash
+composer install
+php artisan key:generate
+```
+
+### 3. Access the App
+
+Visit: [http://localhost:8000](http://localhost:8000)
+
+---
+
+## 🧱 Importing DB Schema and Stored Procedures
+
+### 1. Connect to the MySQL Container
+
+```
+docker exec -it mysql-container mysql -u root -p
+```
+
+### 2. Import Schema and Procedures
+
+Run the SQL script located in `database/schema.sql` (example):
+
+```sql
+SOURCE /docker-entrypoint-initdb.d/schema.sql;
+```
+
+Or from host (if you're not using Docker):
+
+```
+mysql -u root -p company_db < database/schema.sql
+```
+
+Make sure `schema.sql` includes:
+
+- `CREATE TABLE users (...)`
+- Stored procedures:
+  - `get_all_users()`
+  - `get_user_by_id(IN userId INT)`
+  - `create_user(...)`
+  - `update_user(...)`
+  - `delete_user(IN userId INT)`
+
+---
+
+## 📬 API Endpoints (Example Requests)
+
+**Authorization:**  
+All endpoints require the header:  
+Authorization: Bearer p2lbgWkFrykA4QyUmpHihzmc5BNzIABq
+
+All requests use the base URL: `http://localhost:8000/api`
+
+### ➕ Create a User
+
+**POST** `/api/users`
+
+```json
+{
+  "first_name": "John",
+  "last_name": "Doe",
+  "email": "john@example.com"
+}
+```
+
+### 📥 Get All Users
+
+**GET** `/api/users`
+
+Optional query parameters for pagination:  
+- `page` — the page number (e.g., `3`)  
+- `per_page` — number of results per page (e.g., `4`)  
+
+Example:  
+**GET** `/api/users?page=3&per_page=4`
+
+### 🔍 Get User by ID
+
+**GET** `/api/users/{id}`
+
+### ✏️ Update a User
+
+**PUT** `/api/users/{id}`
+
+```json
+{
+  "first_name": "Jane",
+  "last_name": "Smith",
+  "email": "jane@example.com"
+}
+```
+
+### ❌ Delete a User
+
+**DELETE** `/api/users/{id}`
+
+---
+
+## 🔐 Authentication
+
+This API uses **API Key Bearer Token** authentication.
+
+### How to Authenticate
+
+Include the following header with every request to protected endpoints:
+## 🧪 Testing the API
+### Example
+
+```bash
+curl -H "Authorization: Bearer p2lbgWkFrykA4QyUmpHihzmc5BNzIABq" \
+     -X GET http://localhost:8000/api/users
+```
+
+
+----
+
+## 🧪 Testing the API
+
+You can test the API using:
+
+- [Postman](https://www.postman.com/)
+- CURL
+- Frontend client
+
+Example with CURL:
+
+```
+curl -X GET http://localhost:8000/api/users
+```
+
+---
+
+## 📁 Folder Structure Overview
+
+```
+app/
+├── Http/
+│   └── Controllers/
+│       └── UserController.php
+database/
+├── schema.sql          <-- contains table + stored procedures
+routes/
+├── api.php             <-- API route definitions
+```
+
+---
+
+## 📝 License
+
+This project is licensed under the MIT License.
