@@ -1,0 +1,42 @@
+# Dockerfile
+FROM php:8.0-apache
+
+# Enable Apache mod_rewrite for Laravel
+RUN a2enmod rewrite
+
+# Install PHP extensions
+RUN apt-get update && apt-get install -y \
+    libpng-dev \
+    libjpeg-dev \
+    libonig-dev \
+    libxml2-dev \
+    zip \
+    unzip \
+    curl \
+    git \
+    libzip-dev \
+    && docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl bcmath
+
+# Install Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Set working directory to Laravel root
+WORKDIR /var/www
+
+# Copy the Laravel app files into the container
+COPY . /var/www
+
+# Change Apache document root to /var/www/public
+RUN sed -i 's|/var/www/html|/var/www/public|g' /etc/apache2/sites-available/000-default.conf \
+    && sed -i 's|/var/www/html|/var/www/public|g' /etc/apache2/apache2.conf
+
+# Ensure the public directory exists
+RUN mkdir -p /var/www/public
+
+# Set proper permissions
+RUN chown -R www-data:www-data /var/www \
+    && chmod -R 755 /var/www \
+    && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
+
+EXPOSE 80
+CMD ["apache2-foreground"]

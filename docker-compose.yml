@@ -1,0 +1,38 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: php-api-stored-crud
+    container_name: php-api-stored-crud
+    ports:
+      - "8000:80"  # Maps local port 8000 to Apache port 80 inside container
+    volumes:
+      - .:/var/www  # Apache default doc root
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:8.0
+    container_name: php-api-mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: company_db
+      MYSQL_ROOT_PASSWORD: ""
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: php-api-phpmyadmin
+    restart: always
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: mysql
+      MYSQL_ROOT_PASSWORD: ""
+
+volumes:
+  mysql-data:

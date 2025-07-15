@@ -78,6 +78,7 @@ After updating your `.env` or configuration files, run:
 php artisan config:clear
 php artisan cache:clear
 php artisan config:cache
+php artisan route:clear
 ```
 
 ## 🐳 Running with Docker
@@ -91,9 +92,10 @@ docker-compose up -d --build
 ### 2. Install Dependencies inside the Container
 
 ```
-docker exec -it laravel-app bash
+docker exec -it php-api-stored-crud bash
 composer install
 php artisan key:generate
+php artisan migrate
 ```
 
 ### 3. Access the App
